@@ -1,0 +1,44 @@
+Mateizer Rares, 323 CA
+
+
+					Protocoale de Comunicatie
+						Web Crawler
+						   Tema 3
+
+
+
+	Comunicarea crawler-client:
+
+	-clientul se conecteaza la serverul crawler pe portul specificat, si primeste o comanda de configurare de la acesta, din care isi va seta corespunzator parametrii recursive si everything,
+	in functie de optiunile cu care a fost pornit crawler-ul.
+
+
+
+
+	Comunicarea client-http_server:
+
+	-clientul se conecteaza la serverul http pe un socket, si ii trimite acestuia o comanda GET, de forma
+	GET resource HTTP/1.1\nHost:host\r\n\r\n. In cazul in care cererea are succes, serverul http ii raspunde cu mesajul HTTP/1.1 200 OK;
+
+
+
+	Gestionare fisiere:
+
+	-la conectarea unui client, o pereche (id, socket) este adaugata intr-un vector de clienti si intr-unul de clienti disponibili. Id este la randul sau o pereche (adresa, port) care identifica fiecare client intr-un mod unic.
+	-asemanator, la primirea unei comenzi de tip download, resursa se adauga intr-o coada de descarcari, din care se vor extrage pe rand, cand cel putin unul dintre clienti este disponibil.
+
+
+
+
+	Functionalitate:
+
+	-serverul crawler este pornit cu o lista de parametri, care specifica optiunile sale(mod recursiv, everything, fisierul de log) si portul pe care acesta va rula. El asteapta conexiuni din partea clientilor, pana la un numar maxim de 10. Odata conectat un client, serverul ii trimite comanda "CONFIG", urmata de optionalele "RECURSIVE" si "EVERYTHING", care corespund optiunilor serverului.
+	-crawler-ul poate prelua 3 comenzi de la tastatura:
+		-status, ce afiseaza clientii conectati, identificati prin adresa si port;
+		-download <resource>, care adauga resursa specificata in coada de descarcari;
+		-exit, ce anunta clientii ca serverul se va inchide, si apoi se inchide;
+
+	-la primirea unei comenzi valide de download, resursa data ca parametru se va adauga intr-o coada.
+	Daca cel putin un client este disponibil pentru download, si cel putin MIN_CLIENTS sunt conectati, atunci prima pagina din coada se asociaza unuia dintre clientii disponibili, si i se trimite o comanda
+	de forma "GET url". La primirea acestei comenzi, client-ul se conecteaza la serverul http si trimite, la randul sau o cerere GET conform protocolului HTTP. Daca cererea este efectuata cu succes, serverul http va raspunde cu codul de success 200, pe care clientul il va trimite inapoi crawler-ului, pentru a il anunta ca va incepe trimiterea resursei cerute. In cazul in care cererea esueaza, clientul 
+	trimite crawlerului comanda "ERROR", urmata de cuvantul "REQUEST/SEND/READ", ce specifica faptul ca eroarea s-a produs in cererea http. sau in citirea de la serverul http
